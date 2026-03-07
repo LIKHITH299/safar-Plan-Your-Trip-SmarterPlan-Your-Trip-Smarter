@@ -6,7 +6,7 @@ import { MapPin, Calendar, Trash2, ArrowRight, Loader2, Plane } from "lucide-rea
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import { getPlaceThumbnail } from "@/lib/image-search";
+import { fetchPlaceImage } from "@/lib/pexels";
 
 interface Trip {
   id: string;
@@ -36,8 +36,8 @@ export function MyTripsClient({ initialTrips }: { initialTrips: Trip[] }) {
         
         if (!images[cacheKey]) {
           // Use the first landmark + destination for the query
-          const nameToSearch = firstLandmark || trip.destination;
-          const img = await getPlaceThumbnail(nameToSearch, trip.destination);
+          const query = firstLandmark ? `${firstLandmark} ${trip.destination}` : trip.destination;
+          const img = await fetchPlaceImage(query);
           newImages[cacheKey] = img;
         }
       }
