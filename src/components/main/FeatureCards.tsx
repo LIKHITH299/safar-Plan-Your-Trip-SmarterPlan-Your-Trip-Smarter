@@ -3,48 +3,52 @@
 import { motion } from "framer-motion";
 import { Sparkles, Wallet, Utensils, Users, Share2 } from "lucide-react";
 
-const FEATURES = [
-  {
-    title: "AI Itinerary Generator",
-    description: "Get a custom day-by-day plan tailored to your interests.",
-    icon: Sparkles,
-    color: "bg-amber-100 text-amber-600"
-  },
-  {
-    title: "Budget Estimator",
-    description: "Plan your spending with smart cost predictions.",
-    icon: Wallet,
-    color: "bg-emerald-100 text-emerald-600"
-  },
-  {
-    title: "Food Recommendations",
-    description: "Discover the best local cuisines and must-visit eateries.",
-    icon: Utensils,
-    color: "bg-rose-100 text-rose-600"
-  },
-  {
-    title: "Trip Expense Splitter",
-    description: "Easily track and split costs with your travel buddies.",
-    icon: Users,
-    color: "bg-indigo-100 text-indigo-600"
-  },
-  {
-    title: "Shareable Trips",
-    description: "Invite others or share your plan with a simple link.",
-    icon: Share2,
-    color: "bg-sky-100 text-sky-600"
-  }
-];
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export function FeatureCards() {
+  const { t } = useLanguage();
+
+  const FEATURES = [
+    {
+      title: t("featureAI"),
+      description: t("featureAIDesc"),
+      icon: Sparkles,
+      color: "bg-amber-100 text-amber-600"
+    },
+    {
+      title: t("featureBudget"),
+      description: t("featureBudgetDesc"),
+      icon: Wallet,
+      color: "bg-emerald-100 text-emerald-600"
+    },
+    {
+      title: t("featureFood"),
+      description: t("featureFoodDesc"),
+      icon: Utensils,
+      color: "bg-rose-100 text-rose-600"
+    },
+    {
+      title: t("featureSplitter"),
+      description: t("featureSplitterDesc"),
+      icon: Users,
+      color: "bg-indigo-100 text-indigo-600"
+    },
+    {
+      title: t("featureShareable"),
+      description: t("featureShareableDesc"),
+      icon: Share2,
+      color: "bg-sky-100 text-sky-600"
+    }
+  ];
+
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-20 px-4 md:px-6 bg-white">
       <div className="container mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold text-center text-slate-800 mb-16">
-          Everything you need for the <span className="text-sky-500">perfect trip</span>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-slate-800 mb-16">
+          {t("featuresTitle")}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {FEATURES.map((feature, index) => (
             <motion.div
               key={feature.title}

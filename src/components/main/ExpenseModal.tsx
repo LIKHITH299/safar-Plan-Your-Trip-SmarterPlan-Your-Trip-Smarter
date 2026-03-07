@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Users, Wallet, Tag } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
-const CATEGORIES = ["Accommodation", "Food", "Transport", "Activities", "Shopping", "Misc"];
+const CATEGORY_KEYS = ["accommodation", "food", "transport", "activities", "shopping", "misc"];
 
 export function ExpenseModal({ 
   tripId, 
@@ -19,9 +20,10 @@ export function ExpenseModal({
   onRefresh: () => void,
   members?: any[]
 }) {
+  const { t, language } = useLanguage();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("Food");
+  const [category, setCategory] = useState("food");
   const [dayNumber, setDayNumber] = useState(1);
   const [paidBy, setPaidBy] = useState("Me");
   const [members, setMembers] = useState<string[]>(initialMembers.length > 0 ? initialMembers.map(m => m.name) : ["Me"]);
@@ -80,7 +82,34 @@ export function ExpenseModal({
 
     try {
       const isMock = tripId.startsWith("mock-");
-      let newExpenseId = crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+      const newExpenseId = crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+
+      const splitAmount = parseFloat(amount) / splitAmong.length;
+
+      // Handle Offline Mode
+      if (!navigator.onLine && !isMock) {
+        const pendingExpense = {
+          id: `pending-${newExpenseId}`,
+          trip_id: tripId,
+          description,
+          amount: parseFloat(amount),
+          category,
+          paid_by: paidBy,
+          day_number: dayNumber,
+          created_at: new Date().toISOString(),
+          splits: splitAmong.map(name => ({
+            participant_name: name,
+            share_amount: splitAmount
+          }))
+        };
+
+        const existingPending = JSON.parse(localStorage.getItem(`pending_expenses_${tripId}`) || "[]");
+        localStorage.setItem(`pending_expenses_${tripId}`, JSON.stringify([pendingExpense, ...existingPending]));
+        
+        onRefresh();
+        onClose();
+        return;
+      }
 
       if (isMock) {
         const expense = {
@@ -97,7 +126,6 @@ export function ExpenseModal({
         const existingExp = JSON.parse(sessionStorage.getItem(`expenses-${tripId}`) || "[]");
         sessionStorage.setItem(`expenses-${tripId}`, JSON.stringify([expense, ...existingExp]));
 
-        const splitAmount = parseFloat(amount) / splitAmong.length;
         const newSplits = splitAmong.map(name => ({
           id: Math.random().toString(36).substring(2),
           expense_id: newExpenseId,
@@ -128,7 +156,6 @@ export function ExpenseModal({
 
       if (expenseError) throw expenseError;
 
-      const splitAmount = parseFloat(amount) / splitAmong.length;
       const splits = splitAmong.map(name => ({
         expense_id: expense.id,
         participant_name: name,
@@ -145,7 +172,7 @@ export function ExpenseModal({
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Error adding expense");
+      alert(t("errorAddingExpense"));
     } finally {
       setLoading(false);
     }
@@ -159,16 +186,16 @@ export function ExpenseModal({
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
+        className="bg-white w-full max-w-lg rounded-[2.5rem] md:rounded-[3rem] shadow-2xl p-6 sm:p-8 max-h-[95vh] md:max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
               <Plus size={24} />
             </div>
-            Add Expense
+            {t("addExpense")}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full transition-colors">
             <X size={24} />
@@ -177,11 +204,11 @@ export function ExpenseModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Description</label>
+            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">{t("description")}</label>
             <input 
               required
               type="text" 
-              placeholder="e.g. Dinner at Beach Club"
+              placeholder={language === "kn" ? "ಉದಾ: ಹೋಟೆಲ್ ಬಿಲ್" : "e.g. Dinner at Beach Club"}
               value={description}
               onChange={e => setDescription(e.target.value)}
               className="w-full px-5 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400 bg-slate-50 transition-all font-medium"
@@ -190,7 +217,7 @@ export function ExpenseModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Amount</label>
+              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">{t("amount")}</label>
               <div className="relative">
                 <span className="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">₹</span>
                 <input 
@@ -206,7 +233,7 @@ export function ExpenseModal({
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Day</label>
+              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">{t("day")}</label>
               <input 
                 type="number" 
                 min="1"
@@ -218,21 +245,21 @@ export function ExpenseModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Category</label>
+            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">{t("category")}</label>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map(cat => (
+              {CATEGORY_KEYS.map(key => (
                 <button
-                  key={cat}
+                  key={key}
                   type="button"
-                  onClick={() => setCategory(cat)}
+                  onClick={() => setCategory(key)}
                   className={cn(
                     "px-4 py-2 rounded-xl text-sm font-bold transition-all border",
-                    category === cat 
+                    category === key 
                       ? "bg-sky-500 text-white border-sky-500"
                       : "bg-white text-slate-500 border-slate-100 hover:border-sky-200"
                   )}
                 >
-                  {cat}
+                  {t(key as any)}
                 </button>
               ))}
             </div>
@@ -240,20 +267,20 @@ export function ExpenseModal({
 
           <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-50">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Paid By</label>
+              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">{t("paidBy")}</label>
               <select 
                 value={paidBy}
                 onChange={e => setPaidBy(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 font-bold focus:ring-2 focus:ring-sky-400 outline-none"
               >
-                {members.map(p => <option key={p} value={p}>{p}</option>)}
+                {members.map(p => <option key={p} value={p}>{p === "Me" ? t("me") : p}</option>)}
               </select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1 flex items-center justify-between">
-                <span>Split Among</span>
-                <span className="text-[10px] text-sky-600 lowercase">{splitAmong.length} people</span>
+                <span>{t("splitAmong")}</span>
+                <span className="text-[10px] text-sky-600 lowercase">{splitAmong.length} {t("peopleCount")}</span>
               </label>
               <div className="max-h-32 overflow-y-auto space-y-2 pr-2">
                 {members.map(p => (
@@ -268,7 +295,7 @@ export function ExpenseModal({
                       }}
                       className="w-4 h-4 rounded text-sky-500 accent-sky-500"
                     />
-                    <span className="text-sm font-bold text-slate-700">{p}</span>
+                    <span className="text-sm font-bold text-slate-700">{p === "Me" ? t("me") : p}</span>
                   </label>
                 ))}
               </div>
@@ -280,7 +307,7 @@ export function ExpenseModal({
             disabled={loading}
             className="w-full bg-gradient-to-br from-sky-400 to-ocean-blue text-white py-5 rounded-[2rem] font-black text-xl shadow-xl shadow-sky-200 flex items-center justify-center gap-3 hover:scale-[1.02] transition-all active:scale-95"
           >
-            {loading ? "Adding..." : "Confirm Expense"}
+            {loading ? t("adding") : t("confirmExpense")}
           </button>
         </form>
       </motion.div>

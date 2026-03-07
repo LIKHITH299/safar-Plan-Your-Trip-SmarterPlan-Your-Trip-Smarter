@@ -3,39 +3,43 @@
 import { MapPin, Sparkles, PlaneTakeoff } from "lucide-react";
 import { motion } from "framer-motion";
 
-const STEPS = [
-  {
-    title: "Step 1",
-    subtitle: "Enter your destination",
-    description: "Tell us where you want to go and what you love.",
-    icon: MapPin,
-    color: "bg-sky-500"
-  },
-  {
-    title: "Step 2",
-    subtitle: "AI builds itinerary",
-    description: "Our AI crafts a personalized plan in seconds.",
-    icon: Sparkles,
-    color: "bg-ocean-blue"
-  },
-  {
-    title: "Step 3",
-    subtitle: "Travel smarter",
-    description: "Follow your plan, track expenses, and enjoy!",
-    icon: PlaneTakeoff,
-    color: "bg-palm-green"
-  }
-];
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export function HowItWorks() {
+  const { t } = useLanguage();
+
+  const STEPS = [
+    {
+      title: t("step1Title"),
+      subtitle: t("step1Subtitle"),
+      description: t("step1Desc"),
+      icon: MapPin,
+      color: "bg-sky-500"
+    },
+    {
+      title: t("step2Title"),
+      subtitle: t("step2Subtitle"),
+      description: t("step2Desc"),
+      icon: Sparkles,
+      color: "bg-ocean-blue"
+    },
+    {
+      title: t("step3Title"),
+      subtitle: t("step3Subtitle"),
+      description: t("step3Desc"),
+      icon: PlaneTakeoff,
+      color: "bg-palm-green"
+    }
+  ];
+
   return (
-    <section className="py-24 px-6 relative overflow-hidden">
+    <section className="py-16 md:py-24 px-4 md:px-6 relative overflow-hidden">
       <div className="container mx-auto relative z-10">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-800 mb-16">
-          How Safar Works
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-slate-800 mb-16">
+          {t("howItWorksTitle")}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
           {STEPS.map((step, index) => (
             <motion.div
               key={step.title}
