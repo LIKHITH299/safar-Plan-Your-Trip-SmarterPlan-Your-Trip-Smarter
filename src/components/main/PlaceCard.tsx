@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Navigation, Star } from "lucide-react";
 import { motion } from "framer-motion";
-import { fetchPlaceImage } from "@/lib/pexels";
+import { getPlaceThumbnail } from "@/lib/image-search";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -23,7 +23,7 @@ export function PlaceCard({ name, description, time, distance_from_previous, des
 
   useEffect(() => {
     async function loadImage() {
-      const img = await fetchPlaceImage(name, destinationContext);
+      const img = await getPlaceThumbnail(name, destinationContext);
       setImage(img);
       setLoading(false);
     }
