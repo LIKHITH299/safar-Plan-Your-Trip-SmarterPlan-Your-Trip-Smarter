@@ -40,7 +40,7 @@ export function DayCard({ day, places, food_recommendations, transport_tips, alt
         </a>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {places.map((place, i) => (
           <PlaceCard key={i} {...place} destinationContext={destinationContext} />
         ))}

@@ -51,63 +51,42 @@ export function WeatherCard({ data, loading, error }: WeatherCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/40"
+      className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-xl shadow-slate-200/40 w-full"
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-sky-50 rounded-2xl">
-            {getWeatherIcon(data.weather, 40)}
+      <div className="flex flex-col gap-4">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-sky-50 rounded-2xl shrink-0">
+            {getWeatherIcon(data.weather, 28)}
           </div>
           <div>
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
               {t("weatherIn")} {data.city}
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black text-slate-900">{data.temperature}°C</span>
-              <span className="text-slate-500 font-medium capitalize">{data.description}</span>
-            </div>
+            </h3>
+            <p className="text-sm text-slate-500 font-medium capitalize hidden md:block">
+              {data.description}
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-rose-50 rounded-xl text-rose-500">
-              <Thermometer size={18} />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("feelsLike")}</div>
-              <div className="text-sm font-black text-slate-700">{data.feels_like}°C</div>
-            </div>
+        {/* Stats List */}
+        <div className="flex flex-col gap-3 mt-2">
+          <div className="flex items-center gap-3 text-sm md:text-base font-medium text-slate-700 bg-slate-50 p-3 rounded-xl">
+            <Thermometer size={18} className="text-rose-500 shrink-0" />
+            <span className="font-bold w-24">Temperature:</span>
+            <span>{data.temperature}°C</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-xl text-blue-500">
-              <CloudRain size={18} />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("rainChance")}</div>
-              <div className="text-sm font-black text-slate-700">{data.rain_probability > 0 ? `${data.rain_probability}mm` : "0%"}</div>
-            </div>
+          
+          <div className="flex items-center gap-3 text-sm md:text-base font-medium text-slate-700 bg-slate-50 p-3 rounded-xl">
+            <CloudRain size={18} className="text-blue-500 shrink-0" />
+            <span className="font-bold w-24">Rain chance:</span>
+            <span>{data.rain_probability > 0 ? `${data.rain_probability}mm` : "0%"}</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-sky-50 rounded-xl text-sky-600">
-              <Wind size={18} />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("windSpeed")}</div>
-              <div className="text-sm font-black text-slate-700">{data.wind_speed} km/h</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
-              <Droplets size={18} />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("humidity")}</div>
-              <div className="text-sm font-black text-slate-700">{data.humidity}%</div>
-            </div>
+          
+          <div className="flex items-center gap-3 text-sm md:text-base font-medium text-slate-700 bg-slate-50 p-3 rounded-xl">
+            <Wind size={18} className="text-sky-500 shrink-0" />
+            <span className="font-bold w-24">Wind:</span>
+            <span>{data.wind_speed} km/h</span>
           </div>
         </div>
       </div>
